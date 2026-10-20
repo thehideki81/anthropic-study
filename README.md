@@ -51,7 +51,11 @@ cd <repo-folder>
 
 ### 3. The exam guide
 
-The official exam guide is **not** included in this repo. The study docs were built from version 0.2 (last updated 2026-06-30), and you don't need the guide to study with `/exam-mock`. You need it only to update the guide or rebuild the study docs.
+The official exam guide is **not** included in this repo. The study docs were built from version 0.2 (last updated 2026-06-30).
+
+**Last checked that this is the newest edition: 2026-10-20.**
+
+You don't need the guide to study with `/exam-mock`. You need it only to update the guide or rebuild the study docs.
 
 To install it, download it from the official course page (sign-in required):
 <https://anthropic-partners.skilljar.com/claude-certified-architect-foundations-certification/486716>
