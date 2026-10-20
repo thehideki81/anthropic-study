@@ -1,0 +1,47 @@
+# Gap-Focus Mock — Operator Runbook
+
+**Audience: me (the assistant), not the candidate.** The user will NOT read this file — they answer cold and I explain each answer afterward. That conversational explain-after-answer loop is the mechanism that fills the gaps; this runbook only tells me *which* thin spots to target and how to build discriminating questions for each.
+
+**Created:** 2026-06-30, after an audit of the five study docs against the official exam guide (`instructor.pdf`). These are the items that were MISSING or THIN and have since been added to the docs. A normal `exam-mock` samples the whole syllabus; this run deliberately over-samples the freshly-added material so the user actually exercises it.
+
+## How to run it
+
+1. Follow all `exam-mock` SKILL.md rules (fresh scenario-framed questions, distractors from `❌` anti-patterns, **length must not correlate with correctness**, vary the A/B/C/D key, one question at a time, track answers across turns).
+2. **Default to practice mode** for this run (instant grade + explanation per question), because the whole point is to teach the thin spots through the explanation. Offer exam-conditions if the user prefers a cold simulation, but recommend practice.
+3. **~12 questions**, one per gap item below (fold the two D1 minors in only if extending). Don't ask them in doc order — shuffle domains so consecutive questions don't telegraph.
+4. Each question must be a FRESH concrete scenario in one of the six exam scenarios (customer-support agent, Claude Code code-gen, multi-agent research, developer productivity, CI/CD, document extraction). Never reuse the doc's illustrative example verbatim — e.g. don't literally say `fetch_url`/`load_document` in the stem; build an analogous broad-vs-constrained tool pair.
+5. For every item, the **correct option is grounded in the doc's key fact / `✅` line; at least one distractor is the named `❌` anti-pattern** for that gap (the "trap"). Name that trap in the explanation.
+6. At the end, give the standard debrief (headline score, per-domain table, every miss explained, cross-question pattern, thin-margin reminders) but framed around *these specific gaps* — and offer a second pass on any the user missed.
+
+## The question bank (concept → correct basis → planted trap)
+
+Each row: what to test, the discrimination it must force, the correct answer's basis, and the distractor(s) to plant. Source = the study doc section the addition lives in.
+
+### Domain 1 — Agentic Architecture
+1. **TS 1.2 — why route everything through the coordinator.** Force "why centralize?" not "should you centralize?". **Correct:** observability / a single vantage point for monitoring, consistent error handling, controlled information flow. **Trap distractors:** "to reduce latency" / "to save tokens" (point-to-point links would be *cheaper/faster* — that's the lure). Stem idea: a research coordinator where someone proposes direct subagent-to-subagent messaging to cut hops.
+2. **TS 1.4 — human handoff payload.** Force discrimination between escalating *content* vs escalating *a pointer*. **Correct:** compile a structured summary (customer ID/details + root-cause analysis + recommended action) because the human reviewer has no access to the conversation transcript. **Trap:** "hand off the raw transcript" or "escalate with 'agent could not resolve'." Stem idea: support agent escalates a billing dispute to a human queue.
+3. *(minor, optional)* **TS 1.3 — goals vs step-by-step.** Correct: coordinator prompt specifies goals + quality criteria; trap: rigid procedural script that removes subagent adaptability.
+
+### Domain 2 — Tool Design & MCP
+4. **TS 2.3 — constrained alternative.** Force "shrink the capability surface" vs "describe the surface better." **Correct:** replace the broad tool with a narrower purpose-locked one (analogue of `fetch_url` → `load_document`). **Traps:** "add a longer/clearer description to the broad tool" and "force the right tool with `tool_choice`" — both leave the misuse surface intact. Stem idea: an agent that only ever needs internal documents but holds a general URL-fetcher it sometimes misuses.
+5. **TS 2.2 — named structured-error fields.** Force "what's in the error payload the agent reads." **Correct:** application-level `errorCategory` (transient/validation/permission/business) + `isRetryable` boolean + human-readable message. **Traps:** "a bare HTTP status code," "a JSON-RPC `error.code`," or "just the MCP `isError` flag." NOTE: keep honest — `isError` is the real MCP protocol flag; `errorCategory`/`isRetryable` are *application-level* payload fields, not MCP spec. Don't let a distractor falsely claim they're spec fields and mark it wrong on that basis.
+6. **TS 2.2 (minor) — business-rule denial.** **Correct:** return `isRetryable:false` *paired with a customer-friendly explanation* so the agent communicates the denial. **Trap:** "return `isRetryable:false` alone" (agent can't explain) or "mark it transient and let the agent retry" (it'll loop on a policy denial). Stem idea: refund exceeds policy ceiling.
+
+### Domain 3 — Claude Code Config
+7. **TS 3.6 — avoid duplicate CI tests.** Force test-*scenario* dedup vs review-*comment* dedup vs output shape. **Correct:** pass the EXISTING test files as context (and document fixtures/testing standards in CLAUDE.md) so Claude adds only missing coverage. **Traps:** "use `--output-format json`/`--json-schema`" (that's output shape) and "rely on REVIEW.md convergence / report-only-new-findings" (that's review-comment dedup). Stem idea: a CI job that regenerates tests each run and keeps re-creating ones the suite already has.
+
+### Domain 4 — Prompt Engineering & Structured Output
+8. **TS 4.5 — batch + multi-turn tool calling.** ⚠️ **KEY TO THE GUIDE'S ANSWER.** **Correct:** the batch path can't round-trip a *client* tool mid-request — pre-supply the turns or use the synchronous Messages API. **Trap:** "yes, the batch runs the agentic loop so it'll call your DB tool and continue." Even though current API docs support server-side tool loops in batch, the exam keys "batch does not support multi-turn tool calling within a single request" — so the keyed-correct answer is *no, use the synchronous API*. If the user picks the server-tool nuance, give them credit-with-caveat in practice mode but explain the exam's framing. Stem idea: a pipeline that wants Claude to call a lookup tool, read rows, then summarize, all in a batch.
+9. **TS 4.2 — few-shot for extraction.** Force "examples for handling missing data / varied structure" vs "examples for output shape." **Correct:** add diverse examples covering varied document structures with at least one showing the correct **null / "not found"** for an absent field, to curb fabrication and generalize to unseen layouts. **Traps:** "lower temperature," "add one more shape example," or "mark the field required so it always fills it" (forces fabrication). Stem idea: extractor invents a delivery date that the source never states.
+10. **TS 4.4 — `detected_pattern` FP feedback loop (4.4 → 4.1).** Force "systematize dismissals" vs "re-tune blind." **Correct:** tag each finding with the triggering construct (app-level `detected_pattern`), aggregate dismissals by pattern to find the FP-prone category, then refine *that category's* explicit criteria (or disable it). **Trap:** "reword the prompt to be more conservative" or "lower the global confidence threshold." Stem idea: devs keep dismissing one class of finding.
+
+### Domain 5 — Context Management & Reliability
+11. **TS 5.1 — fix-upstream vs trim-on-receipt.** Force "change what the producer emits" vs "trim what you received." **Correct:** modify the upstream agent to emit structured key-facts/citations/relevance-scores (and require subagent metadata) when the downstream agent's budget is tight. **Trap:** "trim the verbose output on the receiving side" (works once, but the producer keeps over-emitting) or "summarize it lossily to save context." Stem idea: a synthesis subagent with a small budget drowning in an upstream agent's verbose reasoning dumps.
+12. **TS 5.6 — content-type → format.** Force "render per content type" vs "normalize to one format." **Correct:** financial/quantitative → tables, news/narrative → prose, technical findings → structured lists. **Trap:** "convert everything to a single uniform format (e.g. all prose / all JSON)." Keep the honest hedge from the doc (this is a derived best practice, not a named primary-doc primitive). Stem idea: a report synthesizer mixing market figures, news, and technical results.
+
+## Reminders specific to this run
+
+- **Don't let length signal the answer.** Several of these correct answers are short ("use the synchronous API," "tables for financial data"); deliberately make a *distractor* the longest, most elaborate option on at least a third of the items.
+- **Name the trap in every explanation.** The teaching value is the user seeing *which* plausible wrong mechanism they reached for (it maps to a real `❌` anti-pattern in the docs).
+- **Honesty on the two hedged items** (#5 spec-vs-app fields, #8 batch guide-vs-current-docs, #12 derived best practice): if the user gives the technically-true-but-not-exam-keyed answer, say so explicitly rather than marking a flat wrong.
+- After scoring, if the user missed clusters in one domain, offer a fresh second-pass quiz built only from those items with the scenarios and option order re-scrambled.

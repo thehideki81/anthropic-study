@@ -1,0 +1,13 @@
+.env
+.DS_Store
+
+# Editor
+.idea/
+
+# Official exam guide: not redistributed, each user installs it with /exam-guide-update
+reference/instructor.pdf
+# Generated PDF (rebuild with scripts/build-pdf.sh)
+reference/study/*.pdf
+# Local Claude Code settings
+.claude/settings.local.json
+CLAUDE.local.md
