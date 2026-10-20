@@ -5,6 +5,7 @@ Study tools for the **Claude Certified Architect – Foundations** exam, run ins
 | Command | What it does |
 |---|---|
 | `/exam-mock` | Generates a fresh, domain-weighted practice exam from the study docs and runs it one question at a time. |
+| `/study-page` | Makes an easy-to-read study page on one topic (e.g. `/study-page Messages API`), built from the study docs and ending with that topic's exam traps. Published as an Artifact, or saved to `pages/` as an HTML file when artifacts aren't available. |
 | `/exam-guide-update` | Maintainer tool: installs a new edition of the exam guide, reports what changed, and updates the repo to match. |
 | `/exam-study-builder` | Maintainer tool: rebuilds or refreshes the study docs from the exam guide and the live Anthropic docs. |
 | `/md-to-pdf` | Turns Markdown files into a styled PDF (used to build the optional study-guide PDF). |
@@ -110,6 +111,7 @@ Anthropic's docs change quickly (model IDs, defaults, limits), so the study docs
 .claude/skills/
   exam-guide-update/    installs a new exam guide edition (maintainers)
   exam-mock/            practice exam generator
+  study-page/           one-topic study pages
   exam-study-builder/   study-doc builder (maintainers)
   md-to-pdf/            Markdown → PDF renderer
 reference/

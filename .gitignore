@@ -11,3 +11,5 @@ reference/study/*.pdf
 # Local Claude Code settings
 .claude/settings.local.json
 CLAUDE.local.md
+# Study pages written locally by /study-page when artifacts are unavailable
+pages/
