@@ -17,14 +17,30 @@ The study material itself is in [`reference/study/`](reference/study/INDEX.md): 
 
 ### 1. Requirements
 
-- **Claude Code**, signed in. Check with `claude --version`.
-- **git**
-- **Python 3** (standard library only, nothing to `pip install`), used by `/exam-guide-update`. macOS and most Linux distributions already have it: check with `python3 --version`.
+#### Taking mock exams: no prerequisites
 
-The following are optional and only needed to build the PDF, update the exam guide, or rebuild the study docs:
+You only need **Claude Code**, signed in (check with `claude --version`), and **git** to clone the repo. `/exam-mock` reads the study docs that are already in the repo, so you don't need Node.js, Python, the exam guide or anything else.
 
-- Node.js (for `npx`), `perl`, and Google Chrome or Chromium. These build the PDF.
-- `pdftotext` from poppler, used to read the exam guide when updating it or rebuilding the docs: `brew install poppler` on macOS, `sudo apt install poppler-utils` on Debian/Ubuntu.
+Everything below is optional.
+
+#### Building the PDF study guide (optional)
+
+`scripts/build-pdf.sh` combines the study docs into one PDF. It needs:
+
+- **Node.js**, for `npx`. The script uses it to fetch `marked`, which converts the Markdown docs to HTML. Nothing is installed globally.
+- **perl**, for a small text cleanup step. It's preinstalled on macOS and most Linux distributions.
+- **Google Chrome or Chromium**, run headless to print the HTML to PDF. If it isn't found automatically, set `CHROME_PATH`.
+
+#### Installing or updating the exam guide (optional)
+
+`/exam-guide-update` installs the official exam guide PDF, and compares editions when a new one comes out. It needs:
+
+- **`pdftotext`** (part of poppler), to read the text of the guide: `brew install poppler` on macOS, `sudo apt install poppler-utils` on Debian/Ubuntu.
+- **Python 3**, to run `compare.py`, which lists what changed between two editions of the guide. It only uses the standard library, so there's nothing to `pip install`. macOS and most Linux distributions already have it: check with `python3 --version`. A first install, with no earlier edition to compare against, doesn't use Python.
+
+#### Rebuilding the study docs (maintainers only)
+
+`/exam-study-builder` needs the exam guide installed (see above) and `pdftotext`. The research itself runs inside Claude Code.
 
 ### 2. Clone
 
